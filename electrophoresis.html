@@ -1,0 +1,193 @@
+<htmlform>
+<script type="text/javascript">
+    var rangeError = '<p>The total % of the HB subtypes entered '
+        + '(<span class="total-perpercentage"></span>) is not within the '
+        + 'expected 98-102% range. Please confirm and re-enter values.</p>';
+    function isAnyFieldEmpty() {
+        var val = getValue('shb-percent.value');
+        if(val === null || val === undefined || val == '') return true;
+
+        val = getValue('fhb-percent.value');
+        if(val === null || val === undefined || val == '') return true;
+
+        val = getValue('hba-percent.value');
+        if(val === null || val === undefined || val == '') return true;
+
+        val = getValue('hba2-percent.value');
+        if(val === null || val === undefined || val == '') return true;
+
+        val = getValue('hbc-percent.value');
+        if(val === null || val === undefined || val == '') return true;
+
+        return false;
+    }
+
+    function normalizePercentageValue(value) {
+        if(value === null || value === undefined || value == '') {
+            return 0.0;
+        }
+        return Number.parseFloat(value);
+    }
+
+    function calculateTotalPercentage() {
+        var total = normalizePercentageValue(getValue('shb-percent.value'));
+        total += normalizePercentageValue(getValue('fhb-percent.value'));
+        total += normalizePercentageValue(getValue('hba-percent.value'));
+        total += normalizePercentageValue(getValue('hba2-percent.value'));
+        total += normalizePercentageValue(getValue('hbc-percent.value'));
+        return total;
+    }
+
+    function isTotalInRange(total) {
+        return (total &gt;= 98  &#38;&#38; total &lt;= 102);
+    }
+
+    function checkTotalPercentage() {
+        var totalPercentage = calculateTotalPercentage();
+        if(!isTotalInRange(totalPercentage)) {
+            jq('.range-error').css('display', 'block');
+            jq('.total-perpercentage').html(totalPercentage + '%');
+            jq('button[type="submit"]').attr('disabled', 'disabled');
+        }
+        else {
+            jq('.range-error').css('display', 'none');
+            jq('#total-perpercentage').html('');
+            jq('button[type="submit"]').removeAttr('disabled');
+        }
+    }
+
+    jq(function() {
+        var rangeErrorConfirmElement = jq('<span></span>', {
+            id: 'confirmation-range-error',
+            class:'range-error error field-error',
+            style: 'display: none;'
+        }).html(rangeError);
+        jq('#confirmation-messages').append(rangeErrorConfirmElement);
+        jq('#range-error').html(rangeError);
+        getField('shb-percent.value').change(checkTotalPercentage);
+        getField('fhb-percent.value').change(checkTotalPercentage);
+        getField('hba-percent.value').change(checkTotalPercentage);
+        getField('hba2-percent.value').change(checkTotalPercentage);
+        getField('hbc-percent.value').change(checkTotalPercentage);
+
+        // This is to ensure the code is run every way the user ends up to the
+        // confirmation page. Sometimes if the save button is active, when using
+        // tab the focus goes there first hence or if inactive as initially when
+        // no data, the focus goes to cancel button.
+        // ** Hacky but works
+        NavigatorController.getSectionById("confirmation").title.click(checkTotalPercentage);
+        jq('input.cancel[type="button"]').focus(checkTotalPercentage);
+        jq('button[type="submit"]').focus(checkTotalPercentage);
+    });
+</script>
+
+ <div class="hidden" id="encounter-details" sectionTag="section" headerStyle="title" headerLabel="Encounter Details">
+        <fieldset>
+            <legend>When?</legend>
+            <label>When?</label>
+
+            <encounterDate default="now" showTime="false"/>
+        </fieldset>
+
+        <fieldset>
+            <legend>Who?</legend>
+            <label>Who?</label>
+
+            <encounterProviderAndRole default="currentUser" encounterRole="240b26f9-dd88-4172-823d-4a8bfeb7841f" required="true"/>
+        </fieldset>
+
+        <fieldset>
+            <legend>Where?</legend>
+            <label>Where?</label>
+
+            <encounterLocation default="SessionAttribute:emrContext.sessionLocationId"/>
+        </fieldset>
+    </div>
+
+<section id="hb" sectionTag="section" headerStyle="title" headerCode="Electrophoresis Results">
+    <span class="range-error error field-error" style="display: none;" id="range-error"></span>
+ <fieldset>
+            <legend><lookup expression="fn.getConcept('163198').name"/></legend>
+            <h3><lookup expression="fn.getConcept('163198').name"/></h3>
+
+            <p>
+                <obs conceptId="163198" id="shb-percent" showUnits="%" unitsCssClass="append-to-value"/>
+            </p>
+        </fieldset>
+
+
+<fieldset>
+            <legend><lookup expression="fn.getConcept('163199').name"/></legend>
+            <h3><lookup expression="fn.getConcept('163199').name"/></h3>
+
+            <p>
+                <obs conceptId="163199" id="fhb-percent" showUnits="%" unitsCssClass="append-to-value"/>
+            </p>
+        </fieldset>
+
+ <fieldset>
+            <legend><lookup expression="fn.getConcept('163200').name"/></legend>
+            <h3><lookup expression="fn.getConcept('163200').name"/></h3>
+
+            <p>
+                <obs conceptId="163200" id="hba-percent" showUnits="%" unitsCssClass="append-to-value"/>
+            </p>
+        </fieldset>
+
+  <fieldset>
+            <legend><lookup expression="fn.getConcept('163201').name"/></legend>
+            <h3><lookup expression="fn.getConcept('163201').name"/></h3>
+
+            <p>
+                <obs conceptId="163201" id="hba2-percent"  showUnits="%" unitsCssClass="append-to-value"/>
+            </p>
+        </fieldset>
+
+   <fieldset>
+            <legend><lookup expression="fn.getConcept('163202').name"/></legend>
+            <h3><lookup expression="fn.getConcept('163202').name"/></h3>
+
+            <p>
+                <obs conceptId="163202" id="hbc-percent" showUnits="%" unitsCssClass="append-to-value"/>
+            </p>
+        </fieldset>
+
+
+   </section>
+	<submit/>
+
+<!-- END OF FORM
+
+Simple examples to copy-and-paste. Full reference at http://wiki.openmrs.org/x/kg8z
+
+SECTION
+	<section headerLabel="\#. Title">
+		Content
+	</section>
+
+NUMERIC OBSERVATION
+	<obs conceptId="id-of-numeric-concept" labelText="Label before"/>
+
+DATE OBSERVATION
+	<obs conceptId="id-of-date-concept" labelText="Label before"/>
+
+CODED OBSERVATION
+(as a dropdown)
+	<obs conceptId="id-of-coded-concept" labelText="Label before"/>
+(as radio buttons)
+	<obs conceptId="id-of-coded-concept" labelText="Label before" style="radio"/>
+(as an autocomplete)
+	<obs conceptId="id-of-coded-concept" labelText="Label before" style="autocomplete" answerClasses="Diagnosis"/>
+(as a checkbox for a specific answer)
+	<obs conceptId="id-of-coded-concept" labelText="Label before" answerConceptId="id-of-answer-concept" answerLabel="label for answer"/>
+(as a dropdown with specific choices)
+	<obs conceptId="id-of-coded-concept" labelText="Label before" answerConceptIds="concept-id-1,concept-id-2,concept-id-3" answerLabels="Label 1,Label 2, Label 3"/>
+
+
+FREE TEXT OBSERVATION
+(as a normal text field)
+	<obs conceptId="id-of-text-concept" labelText="Label before"/>
+(as a textarea)
+	<obs conceptId="id-of-text-concept" labelText="Label before" rows="4" cols="80"/>
+-->
+</htmlform>
