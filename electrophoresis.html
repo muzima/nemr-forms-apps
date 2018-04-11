@@ -44,7 +44,7 @@
 
     function checkTotalPercentage() {
         var totalPercentage = calculateTotalPercentage();
-        if(!isTotalInRange(totalPercentage)) {
+        if(!isTotalInRange(totalPercentage) &#38;&#38; !isAnyFieldEmpty()) {
             jq('.range-error').css('display', 'block');
             jq('.total-perpercentage').html(totalPercentage + '%');
             jq('button[type="submit"]').attr('disabled', 'disabled');
